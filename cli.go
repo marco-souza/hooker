@@ -66,12 +66,12 @@ func addHook(hook string, cmd string) {
 		log.Fatalf("Seems `%s` hook already exists.", hook)
 	}
 
-	data := []byte(cmd)
+	data := []byte("#! /bin/bash\n"+cmd)
 	err := ioutil.WriteFile(hookFilename, data, 0755)
 	check(err)
 
 	bindHook(hook)
-	fmt.Printf("🎉 All right, `%s` hook is ready to go", hook)
+	fmt.Printf("🎉 All right, `%s` hook is ready to go\n", hook)
 }
 
 func bindHook(hook string) {
@@ -89,6 +89,7 @@ func bindHook(hook string) {
 
 func main() {
 	initializeHooker()
-	// addHook("pre-commit", "echo Hello; exit 1")
+	addHook("pre-commit", "echo Hello; exit 1")
+	addHook("pre-push", "echo Hello; exit 1")
 
 }
