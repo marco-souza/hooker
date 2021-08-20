@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 var hooksFolder = ".hooks"
@@ -23,19 +24,20 @@ func initializeHooker() {
 	if _, err := os.Stat(hooksFolder); os.IsNotExist(err) {
 		fmt.Println("🪝 Creating hooks folder")
 
-		err := os.Mkdir(hooksFolder, 0755);
+		err := os.Mkdir(hooksFolder, 0755)
 		check(err)
 	}
 
 	files, err := ioutil.ReadDir(hooksFolder)
-	if (err != nil || len(files) == 0) { return }
+	if err != nil || len(files) == 0 {
+		return
+	}
 
 	fmt.Println("🔗 Binding hooks ")
 	for _, file := range files {
 		bindHook(file.Name())
 	}
 }
-
 
 type Hooks []string
 
@@ -66,7 +68,7 @@ func addHook(hook string, cmd string) {
 		log.Fatalf("Seems `%s` hook already exists.", hook)
 	}
 
-	data := []byte("#! /bin/bash\n"+cmd)
+	data := []byte("#! /bin/bash\n" + cmd)
 	err := ioutil.WriteFile(hookFilename, data, 0755)
 	check(err)
 
@@ -76,20 +78,24 @@ func addHook(hook string, cmd string) {
 
 func bindHook(hook string) {
 	hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
+	hookFile, err := filepath.Abs(hookFilename)
+	check(err)
+
 	target := fmt.Sprintf(".git/hooks/%s", hook)
+	targetFile, err := filepath.Abs(target)
+	check(err)
 
 	if err := os.Remove(target); !os.IsNotExist(err) {
 		check(err)
 	}
 
-	err := os.Symlink(hookFilename, target)
-	check(err)
+	if err := os.Symlink(hookFile, targetFile); err != nil {
+		check(err)
+	}
 }
-
 
 func main() {
 	initializeHooker()
-	addHook("pre-commit", "echo Hello; exit 1")
-	addHook("pre-push", "echo Hello; exit 1")
-
+	addHook("pre-commit", "echo Hello from Hooker")
+	addHook("pre-push", "echo Hello from Hooker")
 }
