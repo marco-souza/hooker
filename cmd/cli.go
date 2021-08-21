@@ -14,6 +14,7 @@ func makeHookerCli() *cobra.Command {
 
 	cli.AddCommand(addCmd)
 	cli.AddCommand(initCmd)
+	cli.AddCommand(dropCmd)
 
 	return cli
 }
