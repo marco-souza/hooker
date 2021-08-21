@@ -36,3 +36,18 @@ func bindHook(hook string) {
 func makeFormatedError(template string, a ...interface{}) error {
 	return errors.New(fmt.Sprintf(template, a...))
 }
+
+type Hooks []string
+
+var availableHooks = Hooks{"pre-push", "pre-commit"}
+
+func (hooks Hooks) Contains(str string) bool {
+
+	for _, v := range hooks {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}

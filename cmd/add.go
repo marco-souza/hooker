@@ -51,18 +51,3 @@ func addHook(hook string, cmd string) {
 	bindHook(hook)
 	fmt.Printf("- 🎉 All right, `%s` hook is ready to go!\n", hook)
 }
-
-type Hooks []string
-
-var availableHooks = Hooks{"pre-push", "pre-commit"}
-
-func (hooks Hooks) Contains(str string) bool {
-
-	for _, v := range hooks {
-		if v == str {
-			return true
-		}
-	}
-
-	return false
-}
