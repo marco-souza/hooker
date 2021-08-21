@@ -5,9 +5,19 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
-func Init() {
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Initialize hooker on local repo",
+	Run: func(cmd *cobra.Command, args []string) {
+		initialize()
+	},
+}
+
+func initialize() {
 	if _, err := os.Stat(".git"); os.IsNotExist(err) {
 		log.Fatal("No git repository found! 😢")
 	}

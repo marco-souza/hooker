@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 )
-
 
 var hooksFolder = ".hooks"
 
@@ -31,4 +31,8 @@ func bindHook(hook string) {
 	if err := os.Symlink(hookFile, targetFile); err != nil {
 		check(err)
 	}
+}
+
+func makeFormatedError(template string, a ...interface{}) error {
+	return errors.New(fmt.Sprintf(template, a...))
 }
