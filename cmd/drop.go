@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	hooks "github.com/marco-souza/hooker/services"
 	"github.com/spf13/cobra"
 )
 
@@ -13,68 +14,45 @@ var dropCmd = &cobra.Command{
 	Aliases: []string{"d", "uninstall"},
 	Short:   "Drop hook",
 	Long:    "Drop the informed hook, or drop hooker if none was passed",
-	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			dropAll()
-			return
-		}
-		hook := args[0]
-		dropHook(hook)
-	},
-	Args: func(cmd *cobra.Command, args []string) error {
-		if err := checkHasHooker(); err != nil {
-			return err
-		}
-
-		if len(args) == 0 {
-			fmt.Println("This will drop ALL git hooks, are you sure? (y/N)")
-
-			reader := bufio.NewReader(os.Stdin)
-			char, _, err := reader.ReadLine()
-			check(err)
-
-			switch string(char) {
-			case "Y", "y", "YES", "yes":
-				return nil
-			}
-
-			os.Exit(0)
-		}
-
-		hook := args[0]
-		if err := checkIsValidHook(hook); err != nil {
-			return err
-		}
-		if !hasHook(hook) {
-			return makeFormatedError("Hmm, looks like `%s` hook doesn't exists.", hook)
-		}
-
-		return nil
-	},
+	Args:    validateDropArgs,
+	Run:     dropHandler,
 }
 
-func dropHook(hook string) {
-	hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
-	err := os.Remove(hookFilename)
-	check(err)
-
-	hookTarget := fmt.Sprintf(".git/hooks/%s", hook)
-	err = os.Remove(hookTarget)
-	check(err)
-
-	fmt.Printf("- 🎉 Ok, `%s` hook is no more!\n", hook)
+func dropHandler(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		hooks.DropAll()
+		return
+	}
+	hook := args[0]
+	hooks.DropHook(hook)
 }
 
-func dropAll() {
-	err := os.RemoveAll(hooksFolder)
-	check(err)
-
-	// remove all hooks symlinks
-	for _, hook := range listHooks() {
-		hookTarget := fmt.Sprintf(".git/hooks/%s", hook)
-		err = os.Remove(hookTarget)
-		check(err)
+func validateDropArgs(cmd *cobra.Command, args []string) error {
+	if err := hooks.CheckHasHookerInitialized(); err != nil {
+		return err
 	}
 
-	fmt.Println("🎉 All right, no hookers here!")
+	if len(args) == 0 {
+		fmt.Println("This will drop ALL git hooks, are you sure? (y/N)")
+
+		reader := bufio.NewReader(os.Stdin)
+		char, _, _ := reader.ReadLine()
+
+		switch string(char) {
+		case "Y", "y", "YES", "yes":
+			return nil
+		}
+
+		os.Exit(0)
+	}
+
+	hook := args[0]
+	if err := hooks.CheckIsValidHook(hook); err != nil {
+		return err
+	}
+	if !hooks.HasHook(hook) {
+		return fmt.Errorf("Hmm, looks like `%s` hook doesn't exists.", hook)
+	}
+
+	return nil
 }

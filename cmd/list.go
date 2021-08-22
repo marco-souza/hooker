@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	hooks "github.com/marco-souza/hooker/services"
 	"github.com/spf13/cobra"
 )
 
@@ -11,39 +12,26 @@ var listCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"l", "ls"},
 	Short:   "Initialize hooker on local repo",
+	Args:    validateListArgs,
 	Run:     listHandler,
-	Args:    argsValidation,
 }
 
 func listHandler(cmd *cobra.Command, args []string) {
-	hooks := listHooks()
+	hooks := hooks.ListHooks()
 	if len(hooks) == 0 {
 		fmt.Println("😖 Sorry, no hook found")
 	}
 	for _, hook := range hooks {
 		hookPath := fmt.Sprintf(".hooks/%s", hook)
-		command, err := ioutil.ReadFile(hookPath)
-		check(err)
+		command, _ := ioutil.ReadFile(hookPath)
 		fmt.Printf("🪝 %s\n===\n%s\n\n", hook, string(command))
 	}
 }
 
-func argsValidation(cmd *cobra.Command, args []string) error {
-	if err := checkHasHooker(); err != nil {
+func validateListArgs(cmd *cobra.Command, args []string) error {
+	if err := hooks.CheckHasHookerInitialized(); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func listHooks() []string {
-	hooksNameList := []string{}
-	files, err := ioutil.ReadDir(hooksFolder)
-	if err != nil || len(files) == 0 {
-		return hooksNameList
-	}
-	for _, file := range files {
-		hooksNameList = append(hooksNameList, file.Name())
-	}
-	return hooksNameList
 }
