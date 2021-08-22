@@ -38,7 +38,22 @@ func makeFormatedError(template string, a ...interface{}) error {
 
 type Hooks []string
 
-var availableHooks = Hooks{"pre-push", "pre-commit"}
+var availableHooks = Hooks{
+	"applypatch-msg",
+	"pre-commit",
+	"pre-rebase",
+	"commit-msg",
+	"pre-commit",
+	"pre-receive",
+	"fsmonitor-watchman",
+	"pre-merge-commit",
+	"push-to-checkout",
+	"post-update",
+	"prepare-commit-msg",
+	"update",
+	"pre-applypatch",
+	"pre-push",
+}
 
 func (hooks Hooks) Contains(str string) bool {
 
