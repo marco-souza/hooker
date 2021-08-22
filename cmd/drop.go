@@ -9,9 +9,10 @@ import (
 )
 
 var dropCmd = &cobra.Command{
-	Use:   "drop <hook>",
-	Short: "Drop hook",
-	Long:  "Drop the informed hook, or drop hooker if none was passed",
+	Use:     "drop <hook>",
+	Aliases: []string{"d", "uninstall"},
+	Short:   "Drop hook",
+	Long:    "Drop the informed hook, or drop hooker if none was passed",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			dropAll()

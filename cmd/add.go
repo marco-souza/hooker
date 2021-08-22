@@ -10,8 +10,9 @@ import (
 )
 
 var addCmd = &cobra.Command{
-	Use:   "add [hook] [command]",
-	Short: "Add a new hook command",
+	Use:     "add [hook] [command]",
+	Aliases: []string{"a"},
+	Short:   "Add a new hook command",
 	Run: func(cmd *cobra.Command, args []string) {
 		hook, commands := args[0], args[1:]
 		addHook(hook, strings.Join(commands, " "))

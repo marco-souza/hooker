@@ -10,8 +10,9 @@ import (
 )
 
 var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Initialize hooker on local repo",
+	Use:     "init",
+	Aliases: []string{"i", "install"},
+	Short:   "Initialize hooker on local repo",
 	Run: func(cmd *cobra.Command, args []string) {
 		initialize()
 	},
