@@ -51,3 +51,25 @@ func (hooks Hooks) Contains(str string) bool {
 
 	return false
 }
+
+func checkHasHooker() error {
+	if _, err := os.Stat(hooksFolder); os.IsNotExist(err) {
+		return makeFormatedError("Please, initialize your project with `hooker init`.")
+	}
+	return nil
+}
+
+func checkIsValidHook(hook string) error {
+	if !availableHooks.Contains(hook) {
+		return makeFormatedError("Oops, `%s` is not a git-hook, try: %s", hook, availableHooks)
+	}
+	return nil
+}
+
+func checkHookExists(hook string) error {
+	hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
+	if _, err := os.Stat(hookFilename); os.IsNotExist(err) {
+		return makeFormatedError("Hmm, looks like `%s` hook doesn't exists.", hook)
+	}
+	return nil
+}

@@ -22,12 +22,12 @@ var dropCmd = &cobra.Command{
 		dropHook(hook)
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
-		if _, err := os.Stat(hooksFolder); os.IsNotExist(err) {
-			return makeFormatedError("Please, initialize your project with `hooker init`.")
+		err := checkHasHooker()
+		if err != nil {
+			return err
 		}
 
-		switch len(args) {
-		case 0:
+		if len(args) == 0 {
 			fmt.Println("This will drop ALL git hooks, are you sure? (y/N)")
 
 			reader := bufio.NewReader(os.Stdin)
@@ -45,13 +45,14 @@ var dropCmd = &cobra.Command{
 		}
 
 		hook := args[0]
-		if !availableHooks.Contains(hook) {
-			return makeFormatedError("Oops, `%s` is not a git-hook, try: %s", args[0], availableHooks)
+		err = checkIsValidHook(hook)
+		if err != nil {
+			return err
 		}
 
-		hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
-		if _, err := os.Stat(hookFilename); os.IsNotExist(err) {
-			return makeFormatedError("Hmm, looks like `%s` hook doesn't exists.", hook)
+		err = checkHookExists(hook)
+		if err != nil {
+			return err
 		}
 
 		return nil
