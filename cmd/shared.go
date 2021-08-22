@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -34,7 +33,7 @@ func bindHook(hook string) {
 }
 
 func makeFormatedError(template string, a ...interface{}) error {
-	return errors.New(fmt.Sprintf(template, a...))
+	return fmt.Errorf(template, a...)
 }
 
 type Hooks []string
