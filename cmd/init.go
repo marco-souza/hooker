@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -28,15 +27,14 @@ func initialize() {
 
 		err := os.Mkdir(hooksFolder, 0755)
 		check(err)
+
+		if hooks := listHooks(); len(hooks) > 0 {
+			fmt.Println("🔗 Binding hooks ")
+			for _, hook := range hooks {
+				bindHook(hook)
+			}
+		}
 	}
 
-	files, err := ioutil.ReadDir(hooksFolder)
-	if err != nil || len(files) == 0 {
-		return
-	}
-
-	fmt.Println("🔗 Binding hooks ")
-	for _, file := range files {
-		bindHook(file.Name())
-	}
+	fmt.Println("🎉 Your hooker is ready to go!")
 }

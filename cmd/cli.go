@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
 func makeHookerCli() *cobra.Command {
@@ -15,6 +16,7 @@ func makeHookerCli() *cobra.Command {
 	cli.AddCommand(addCmd)
 	cli.AddCommand(initCmd)
 	cli.AddCommand(dropCmd)
+	cli.AddCommand(listCmd)
 
 	return cli
 }

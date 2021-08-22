@@ -34,10 +34,7 @@ var dropCmd = &cobra.Command{
 			check(err)
 
 			switch string(char) {
-			case "Y":
-			case "y":
-			case "YES":
-			case "yes":
+			case "Y","y","YES","yes":
 				return nil
 			}
 			return makeFormatedError("Please specify a hook")
@@ -70,5 +67,13 @@ func dropHook(hook string) {
 func dropAll() {
 	err := os.RemoveAll(hooksFolder)
 	check(err)
+
+	// remove all hooks symlinks
+	for _, hook := range listHooks() {
+		hookTarget := fmt.Sprintf(".git/hooks/%s", hook)
+		err = os.Remove(hookTarget)
+		check(err)
+	}
+
 	fmt.Println("🎉 All right, no hookers here!")
 }
