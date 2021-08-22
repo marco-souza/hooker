@@ -1,6 +1,6 @@
 package main
 
-import "marco-souza/hooker/cmd"
+import "github.com/marco-souza/hooker/cmd"
 
 func main() {
 	cmd.Execute()

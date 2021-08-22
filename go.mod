@@ -1,4 +1,4 @@
-module marco-souza/hooker
+module github.com/marco-souza/hooker
 
 go 1.16
 
