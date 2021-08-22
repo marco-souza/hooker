@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -18,6 +17,10 @@ var addCmd = &cobra.Command{
 		addHook(hook, strings.Join(commands, " "))
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
+		if err := checkHasHooker(); err != nil {
+			return err
+		}
+
 		switch len(args) {
 		case 0:
 			return makeFormatedError("Please specify a hook")
@@ -26,16 +29,11 @@ var addCmd = &cobra.Command{
 		}
 
 		hook := args[0]
-		if !availableHooks.Contains(hook) {
-			return makeFormatedError("Oops, `%s` is not a git-hook, try: %s", args[0], availableHooks)
+		if err := checkIsValidHook(hook); err != nil {
+			return err
 		}
 
-		if _, err := os.Stat(hooksFolder); os.IsNotExist(err) {
-			return makeFormatedError("Please, initialize your project with `hooker init`.")
-		}
-
-		hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
-		if _, err := os.Stat(hookFilename); !os.IsNotExist(err) {
+		if hasHook(hook) {
 			return makeFormatedError("Hmm, looks like `%s` hook already exists.", hook)
 		}
 

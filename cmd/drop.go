@@ -22,8 +22,7 @@ var dropCmd = &cobra.Command{
 		dropHook(hook)
 	},
 	Args: func(cmd *cobra.Command, args []string) error {
-		err := checkHasHooker()
-		if err != nil {
+		if err := checkHasHooker(); err != nil {
 			return err
 		}
 
@@ -45,14 +44,11 @@ var dropCmd = &cobra.Command{
 		}
 
 		hook := args[0]
-		err = checkIsValidHook(hook)
-		if err != nil {
+		if err := checkIsValidHook(hook); err != nil {
 			return err
 		}
-
-		err = checkHookExists(hook)
-		if err != nil {
-			return err
+		if !hasHook(hook) {
+			return makeFormatedError("Hmm, looks like `%s` hook doesn't exists.", hook)
 		}
 
 		return nil

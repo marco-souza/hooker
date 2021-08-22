@@ -66,10 +66,10 @@ func checkIsValidHook(hook string) error {
 	return nil
 }
 
-func checkHookExists(hook string) error {
+func hasHook(hook string) bool {
 	hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
 	if _, err := os.Stat(hookFilename); os.IsNotExist(err) {
-		return makeFormatedError("Hmm, looks like `%s` hook doesn't exists.", hook)
+		return false
 	}
-	return nil
+	return true
 }
