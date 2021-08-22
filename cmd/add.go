@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -34,7 +36,18 @@ var addCmd = &cobra.Command{
 		}
 
 		if hasHook(hook) {
-			return makeFormatedError("Hmm, looks like `%s` hook already exists.", hook)
+			fmt.Printf("Hmm, looks like `%s` hook already exists. Do you wanna replace it? (Y/n)", hook)
+
+			reader := bufio.NewReader(os.Stdin)
+			char, _, err := reader.ReadLine()
+			check(err)
+
+			switch string(char) {
+			case "", "Y", "y", "YES", "yes":
+				return nil
+			}
+
+			return makeFormatedError("This hook is already being used.")
 		}
 
 		return nil

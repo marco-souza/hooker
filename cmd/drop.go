@@ -34,7 +34,7 @@ var dropCmd = &cobra.Command{
 			check(err)
 
 			switch string(char) {
-			case "Y","y","YES","yes":
+			case "Y", "y", "YES", "yes":
 				return nil
 			}
 			return makeFormatedError("Please specify a hook")
