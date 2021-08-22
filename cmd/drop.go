@@ -37,7 +37,8 @@ var dropCmd = &cobra.Command{
 			case "Y", "y", "YES", "yes":
 				return nil
 			}
-			return makeFormatedError("Please specify a hook")
+
+			os.Exit(0)
 		}
 
 		hook := args[0]

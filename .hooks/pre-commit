@@ -1,2 +1,2 @@
 #! /bin/bash
-goimports -w . && git add -u
+goimports -w . && go mod tidy && go install . && git add -u && git add go.mod go.sum

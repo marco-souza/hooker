@@ -36,7 +36,7 @@ var addCmd = &cobra.Command{
 		}
 
 		if hasHook(hook) {
-			fmt.Printf("Hmm, looks like `%s` hook already exists. Do you wanna replace it? (Y/n)", hook)
+			fmt.Printf("Hmm, looks like `%s` hook already exists. Do you wanna replace it? (Y/n) ", hook)
 
 			reader := bufio.NewReader(os.Stdin)
 			char, _, err := reader.ReadLine()
@@ -47,7 +47,7 @@ var addCmd = &cobra.Command{
 				return nil
 			}
 
-			return makeFormatedError("This hook is already being used.")
+			os.Exit(0)
 		}
 
 		return nil
