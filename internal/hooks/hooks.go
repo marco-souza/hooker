@@ -20,7 +20,7 @@ var instance *hook
 func New() *hook {
 	if instance == nil {
 		instance = &hook{
-			folder: "./hooks",
+			folder: "./.hooks",
 			availableHooks: hooks{
 				"applypatch-msg",
 				"pre-commit",
