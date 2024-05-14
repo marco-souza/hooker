@@ -8,7 +8,7 @@ A simple git hook manager written in go (an alternative to husky)
 # install the latest version
 go install github.com/marco-souza/hooker@latest
 # install an specific version
-go install github.com/marco-souza/hooker@v0.0.3
+go install github.com/marco-souza/hooker@v0.0.4
 ```
 
 ## Usage
