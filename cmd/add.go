@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	hooks "github.com/marco-souza/hooker/services"
 	"github.com/spf13/cobra"
 )
 
@@ -20,11 +19,11 @@ var addCmd = &cobra.Command{
 
 func addHandler(cmd *cobra.Command, args []string) {
 	hook, commands := args[0], args[1:]
-	hooks.AddHook(hook, strings.Join(commands, " "))
+	h.AddHook(hook, strings.Join(commands, " "))
 }
 
 func valdiateAddArgs(cmd *cobra.Command, args []string) error {
-	if err := hooks.CheckHasHookerInitialized(); err != nil {
+	if err := h.CheckHasHookerInitialized(); err != nil {
 		return err
 	}
 
@@ -36,11 +35,11 @@ func valdiateAddArgs(cmd *cobra.Command, args []string) error {
 	}
 
 	hook := args[0]
-	if err := hooks.CheckIsValidHook(hook); err != nil {
+	if err := h.CheckIsValidHook(hook); err != nil {
 		return err
 	}
 
-	if hooks.HasHook(hook) {
+	if h.HasHook(hook) {
 		fmt.Printf("Hmm, looks like `%s` hook already exists. Do you wanna replace it? (Y/n) ", hook)
 
 		reader := bufio.NewReader(os.Stdin)

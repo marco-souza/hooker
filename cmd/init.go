@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	hooks "github.com/marco-souza/hooker/services"
 	"github.com/spf13/cobra"
 )
 
@@ -10,6 +9,6 @@ var initCmd = &cobra.Command{
 	Aliases: []string{"i", "install"},
 	Short:   "Initialize hooker on local repo",
 	Run: func(cmd *cobra.Command, args []string) {
-		hooks.Init()
+		h.Init()
 	},
 }

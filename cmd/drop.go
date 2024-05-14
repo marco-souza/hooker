@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	hooks "github.com/marco-souza/hooker/services"
 	"github.com/spf13/cobra"
 )
 
@@ -20,20 +19,20 @@ var dropCmd = &cobra.Command{
 
 func dropHandler(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
-		hooks.DropAll()
+		h.DropAll()
 		return
 	}
 	hook := args[0]
-	hooks.DropHook(hook)
+	h.DropHook(hook)
 }
 
 func validateDropArgs(cmd *cobra.Command, args []string) error {
-	if err := hooks.CheckHasHookerInitialized(); err != nil {
+	if err := h.CheckHasHookerInitialized(); err != nil {
 		return err
 	}
 
 	if len(args) == 0 {
-		fmt.Println("This will drop ALL git hooks, are you sure? (y/N)")
+		fmt.Println("This will drop ALL git h, are you sure? (y/N)")
 
 		reader := bufio.NewReader(os.Stdin)
 		char, _, _ := reader.ReadLine()
@@ -47,10 +46,10 @@ func validateDropArgs(cmd *cobra.Command, args []string) error {
 	}
 
 	hook := args[0]
-	if err := hooks.CheckIsValidHook(hook); err != nil {
+	if err := h.CheckIsValidHook(hook); err != nil {
 		return err
 	}
-	if !hooks.HasHook(hook) {
+	if !h.HasHook(hook) {
 		return fmt.Errorf("Hmm, looks like `%s` hook doesn't exists.", hook)
 	}
 

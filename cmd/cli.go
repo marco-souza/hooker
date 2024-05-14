@@ -3,8 +3,11 @@ package cmd
 import (
 	"log"
 
+	"github.com/marco-souza/hooker/internal/hooks"
 	"github.com/spf13/cobra"
 )
+
+var h = hooks.New()
 
 func makeHookerCli() *cobra.Command {
 	cli := &cobra.Command{
