@@ -2,47 +2,61 @@ package hooks
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 )
 
-type Hooks []string
-
-var hooksFolder = ".hooks"
-var availableHooks = Hooks{
-	"applypatch-msg",
-	"pre-commit",
-	"pre-rebase",
-	"commit-msg",
-	"pre-commit",
-	"pre-receive",
-	"fsmonitor-watchman",
-	"pre-merge-commit",
-	"push-to-checkout",
-	"post-update",
-	"prepare-commit-msg",
-	"update",
-	"pre-applypatch",
-	"pre-push",
+type hook struct {
+	folder         string
+	availableHooks hooks
 }
 
-func Init() {
+type hooks []string
+
+var instance *hook
+
+// New creates a new instance of hook service
+func New() *hook {
+	if instance == nil {
+		instance = &hook{
+			folder: "./hooks",
+			availableHooks: hooks{
+				"applypatch-msg",
+				"pre-commit",
+				"pre-rebase",
+				"commit-msg",
+				"pre-receive",
+				"fsmonitor-watchman",
+				"pre-merge-commit",
+				"push-to-checkout",
+				"post-update",
+				"prepare-commit-msg",
+				"update",
+				"pre-applypatch",
+				"pre-push",
+			},
+		}
+	}
+
+	return instance
+}
+
+func (h *hook) Init() {
 	if _, err := os.Stat(".git"); os.IsNotExist(err) {
 		log.Fatal("No git repository found! 😢")
 	}
 
-	if _, err := os.Stat(hooksFolder); os.IsNotExist(err) {
+	if _, err := os.Stat(h.folder); os.IsNotExist(err) {
 		fmt.Println("🪝 Creating hooks folder")
 
-		err := os.Mkdir(hooksFolder, 0755)
+		err := os.Mkdir(h.folder, 0755)
 		check(err)
 
-		if hooks := ListHooks(); len(hooks) > 0 {
+		if hooks := h.ListHooks(); len(hooks) > 0 {
 			fmt.Println("🔗 Binding hooks ")
 			for _, hook := range hooks {
-				bindHook(hook)
+				h.bindHook(hook)
 			}
 		}
 	}
@@ -50,18 +64,18 @@ func Init() {
 	fmt.Println("🎉 Your hooker is ready to go!")
 }
 
-func AddHook(hook string, cmd string) {
+func (h *hook) AddHook(hook string, cmd string) {
 	data := []byte("#! /bin/bash\n" + cmd)
-	hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
-	err := ioutil.WriteFile(hookFilename, data, 0755)
+	hookFilename := fmt.Sprintf("%s/%s", h.folder, hook)
+	err := os.WriteFile(hookFilename, data, 0755)
 	check(err)
 
-	bindHook(hook)
+	h.bindHook(hook)
 	fmt.Printf("- 🎉 All right, `%s` hook is ready to go!\n", hook)
 }
 
-func DropHook(hook string) {
-	hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
+func (h *hook) DropHook(hook string) {
+	hookFilename := fmt.Sprintf("%s/%s", h.folder, hook)
 	err := os.Remove(hookFilename)
 	check(err)
 
@@ -72,12 +86,12 @@ func DropHook(hook string) {
 	fmt.Printf("- 🎉 Ok, `%s` hook is no more!\n", hook)
 }
 
-func DropAll() {
-	err := os.RemoveAll(hooksFolder)
+func (h *hook) DropAll() {
+	err := os.RemoveAll(h.folder)
 	check(err)
 
 	// remove all hooks symlinks
-	for _, hook := range ListHooks() {
+	for _, hook := range h.ListHooks() {
 		hookTarget := fmt.Sprintf(".git/hooks/%s", hook)
 		err = os.Remove(hookTarget)
 		check(err)
@@ -86,9 +100,11 @@ func DropAll() {
 	fmt.Println("🎉 All right, no hookers here!")
 }
 
-func ListHooks() []string {
+func (h *hook) ListHooks() []string {
 	hooksNameList := []string{}
-	files, err := ioutil.ReadDir(hooksFolder)
+	files, err := os.ReadDir(h.folder)
+	// read dir error or no files
+
 	if err != nil || len(files) == 0 {
 		return hooksNameList
 	}
@@ -98,30 +114,30 @@ func ListHooks() []string {
 	return hooksNameList
 }
 
-func CheckIsValidHook(hook string) error {
-	if !isValidHook(hook) {
-		return fmt.Errorf("Oops, `%s` is not a git-hook, try: %s", hook, availableHooks)
+func (h *hook) CheckIsValidHook(hook string) error {
+	if !h.isValidHook(hook) {
+		return fmt.Errorf("Oops, `%s` is not a git-hook, try: %s", hook, h.availableHooks)
 	}
 	return nil
 }
 
-func CheckHasHookerInitialized() error {
-	if _, err := os.Stat(hooksFolder); os.IsNotExist(err) {
+func (h *hook) CheckHasHookerInitialized() error {
+	if _, err := os.Stat(h.folder); os.IsNotExist(err) {
 		return fmt.Errorf("Please, initialize your project with `hooker init`.")
 	}
 	return nil
 }
 
-func HasHook(hook string) bool {
-	hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
+func (h *hook) HasHook(hook string) bool {
+	hookFilename := fmt.Sprintf("%s/%s", h.folder, hook)
 	if _, err := os.Stat(hookFilename); os.IsNotExist(err) {
 		return false
 	}
 	return true
 }
 
-func isValidHook(hook string) bool {
-	for _, v := range availableHooks {
+func (h *hook) isValidHook(hook string) bool {
+	for _, v := range h.availableHooks {
 		if v == hook {
 			return true
 		}
@@ -130,8 +146,8 @@ func isValidHook(hook string) bool {
 	return false
 }
 
-func bindHook(hook string) {
-	hookFilename := fmt.Sprintf("%s/%s", hooksFolder, hook)
+func (h *hook) bindHook(hook string) {
+	hookFilename := fmt.Sprintf("%s/%s", h.folder, hook)
 	hookFile, err := filepath.Abs(hookFilename)
 	check(err)
 
