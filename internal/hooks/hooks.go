@@ -52,12 +52,12 @@ func (h *hook) Init() {
 
 		err := os.Mkdir(h.folder, 0755)
 		check(err)
+	}
 
-		if hooks := h.ListHooks(); len(hooks) > 0 {
-			fmt.Println("🔗 Binding hooks ")
-			for _, hook := range hooks {
-				h.bindHook(hook)
-			}
+	if hooks := h.ListHooks(); len(hooks) > 0 {
+		fmt.Println("🔗 Binding hooks ")
+		for _, hook := range hooks {
+			h.bindHook(hook)
 		}
 	}
 
